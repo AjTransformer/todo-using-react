@@ -1,21 +1,19 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
+import React from 'react';
+import { useSelector } from 'react-redux';
 
 function A() {
+  const result = useSelector(state => state.tasks);
 
-    const result = useSelector(function(output){
-        return output.tasks;
-    })
   return (
     <div>
-        <h3>Tasks:</h3>
-        {
-          result.map(function(task, index){
-            return (<li key={index}>{task}</li>)
-          })
-        }
-      </div>
-  )
+      <h3>Tasks:</h3>
+      <ul className="task-list">
+        {result.map((task, index) => (
+          <li key={index}>{task}</li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
-export default A
+export default A;
