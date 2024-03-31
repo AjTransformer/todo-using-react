@@ -1,56 +1,130 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
 import './A.css';
-import { useDispatch } from 'react-redux';
-import { removeTask , lastTask} from './redux';
+import { database } from './firebase';
+
+function A({setEditValue,setTask,setOldData}) {
+  const[data , setData] = useState([])
 
 
-function A({setEditValue,setTask}) {
-  const result = useSelector(state => state.tasks);
-  const todoDispatcher = useDispatch();
+  useEffect(function () {
+    database.collection("todolist").onSnapshot(function (mySnapshot) {
+      setData(mySnapshot.docs.map(function (i) {
+        return i.data().Item;
+      }));
+    });
+  }, [])
+
+  function editMyTask(index) {
+    const taskToBeDone = document.getElementById(`taskName-${index}`).textContent;
+    setEditValue(index);
+    setTask(taskToBeDone);
+    setOldData(taskToBeDone);
+  }
+
+  useEffect(function(){
+    database.collection("todolist").onSnapshot(function(mySnapshot){
+        //this will show me data present in db and I have to store it...
+        setData(mySnapshot.docs.map(function(i)
+        {
+            return i.data().Item
+        }
+        ))
+    });
+  },[])
 
   function completeMyItem(index) {
-    const taskName = document.getElementById(`taskName-${index}`);
-    if (taskName) {
-      taskName.style.textDecoration =
-        taskName.style.textDecoration === 'line-through' ? 'none' : 'line-through';
-    }
+    const taskNameElement = document.getElementById(`taskName-${index}`);
+    if (taskNameElement) {
+      const taskName = taskNameElement.textContent.trim();
+      
+      // Query for the document where 'Item' matches the taskName
+      database.collection("todolist").where("Item", "==", taskName).get()
+      .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+
+              const currentStatus = doc.data().status;
+                  
+              // Toggle the status value
+              const newStatus = !currentStatus;
+              if(newStatus){
+                taskNameElement.style.textDecoration = 'line-through';
+              }else{
+                taskNameElement.style.textDecoration = 'none';
+              }
+              // Update the 'Status' field in the document
+              doc.ref.update({
+                  status: newStatus // Replace 'new_status' with the new status value
+              })
+              .then(() => {
+                  console.log("Status updated successfully");
+              })
+              .catch((error) => {
+                  console.error("Error updating status: ", error);
+              });
+          });
+      })
+      .catch((error) => {
+          console.error("Error getting documents: ", error);
+      });
+  }
   }
 
-  function removeMyTask(index){
-    const data = document.getElementById(`taskName-${index}`).textContent;
-    todoDispatcher(removeTask(data))
-  }
+  const deleteCollection = async (itemToDelete) => {
+    const snapshot = await database.collection("todolist").where("Item", "==", itemToDelete).get();
+    snapshot.forEach(doc => {
+      doc.ref.delete();
+    });
+  };  
+   
+  useEffect(function(){
+    data.forEach((task, index) => {
+      const textContent = document.getElementById(`taskName-${index}`);
+      const checkboxElement = document.getElementById(`check-${index}`);
+      if(textContent){
+        database.collection("todolist").where("Item","==",task).get()
+        .then((result)=>{
+          result.forEach((val)=>{
+            const status = val.data().status;
+            if(status){
+              textContent.style.textDecoration = 'line-through';
+              checkboxElement.checked = true;
+            } else {
+              textContent.style.textDecoration = 'none';
+              checkboxElement.checked = false;
+            }
+          })
+        })
+        .catch((error)=>{
+          console.log("error while loading ",error);
+        })
+      }
+    })
+  },[data])
 
-  function editMyTask(index){
-    console.log(document.getElementById(`taskName-${index}`).textContent)
-    const taskToBeDone = document.getElementById(`taskName-${index}`).textContent
-    setEditValue(index)
-    setTask(taskToBeDone)
-    todoDispatcher(lastTask(taskToBeDone))
-  }
+  
   return (
     <div>
       <h3>Tasks:</h3>
       <form className="task-form">
         <ul className="task-list">
-          {result.map((task, index) => (
+          {data.map((task, index) => (
             <li key={index}>
-              <input
-                name=""
-                type="checkbox"
-                id={`check-${index}`}
-                onClick={() => completeMyItem(index)}
-              />
+              <label class="checked-container">
+                <input type="checkbox" id={`check-${index}`}
+                onClick={() => completeMyItem(index)}/>
+                <div class="checkmark"></div>
+              </label>
               <label htmlFor={`check-${index}`} id={`taskName-${index}`}>
-                {task}
+                <h4>{task}</h4>
               </label>
               <lord-icon
                 src="https://cdn.lordicon.com/wpyrrmcq.json"
                 trigger="hover"
                 id="delete"
                 onClick={function(){
-                  removeMyTask(index)
+                  // removeMyTask(index)
+                  const dataToDelete = document.getElementById(`taskName-${index}`).textContent;
+                  deleteCollection(dataToDelete)
                 }}
               />
               <button type="button" className="editBtn">
