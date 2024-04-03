@@ -1,6 +1,6 @@
 import React,{useState} from 'react'
 import { BrowserRouter,Route,Routes,Link } from 'react-router-dom'
-import login from '../Login/login'
+import Login from '../Login/login'
 import App from '../App.js'
 
 function Navbar() {
@@ -9,11 +9,11 @@ function Navbar() {
   return (
     <div>
       <BrowserRouter>
-        {isLoggedIn?<link to="/home"></link>:<link to="/"></link>}
+        {isLoggedIn?<Link to="/home"></Link>:<Link to="/login"></Link>}
       
       
       <Routes>
-        <Route path="/" element={<login isLoggedIn={isLoggedIn}/>}></Route>
+        <Route path="/login" element={<Login isLoggedIn={isLoggedIn}/>}></Route>
         <Route path="/home" element={<App isLoggedIn={isLoggedIn}/>}></Route>
       </Routes>
     </BrowserRouter>
