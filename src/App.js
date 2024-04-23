@@ -2,8 +2,13 @@ import './App.css';
 import { useState } from 'react';
 import A from './A';
 import { database } from './firebase';
+import { redirect } from 'react-router-dom';
 
-function App() {
+function App(props) {
+  if(!props.isLoggedIn){
+    window.location.pathname = '/login';
+  }
+  
   const [task, setTask] = useState("");
   const [editedValue , setEditValue] = useState(null)
   const [oldData , setOldData] = useState("")

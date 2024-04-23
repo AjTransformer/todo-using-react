@@ -1,7 +1,14 @@
 import React from 'react'
 import './login.css'
+import { redirect, useNavigate } from 'react-router-dom'
 
-function Login() {
+function Login(props) {
+   const navigate = useNavigate();
+
+   function enterHomePage(){
+      props.setIsLoggedIn(true);
+      navigate('/home')
+   }
   return (
     <div className="wrapper">
         <div className="card-switch">
@@ -15,7 +22,7 @@ function Login() {
                      <form className="flip-card__form" action="">
                         <input className="flip-card__input" name="email" placeholder="Email" type="email"/>
                         <input className="flip-card__input" name="password" placeholder="Password" type="password"/>
-                        <button className="flip-card__btn">Let`s go!</button>
+                        <button className="flip-card__btn" id="entry" onClick={enterHomePage}>Let`s go!</button>
                      </form>
                   </div>
                   <div className="flip-card__back">
@@ -24,7 +31,7 @@ function Login() {
                         <input className="flip-card__input" placeholder="Name" type="name"/>
                         <input className="flip-card__input" name="email" placeholder="Email" type="email"/>
                         <input className="flip-card__input" name="password" placeholder="Password" type="password"/>
-                        <button className="flip-card__btn">Confirm!</button>
+                        <button className="flip-card__btn" id="setUp">Confirm!</button>
                      </form>
                   </div>
                </div>

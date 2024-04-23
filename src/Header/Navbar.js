@@ -13,7 +13,7 @@ function Navbar() {
       
       
       <Routes>
-        <Route path="/login" element={<Login isLoggedIn={isLoggedIn}/>}></Route>
+        <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn}/>}></Route>
         <Route path="/home" element={<App isLoggedIn={isLoggedIn}/>}></Route>
       </Routes>
     </BrowserRouter>

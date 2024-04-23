@@ -109,10 +109,10 @@ function A({setEditValue,setTask,setOldData}) {
         <ul className="task-list">
           {data.map((task, index) => (
             <li key={index}>
-              <label class="checked-container">
+              <label className="checked-container">
                 <input type="checkbox" id={`check-${index}`}
                 onClick={() => completeMyItem(index)}/>
-                <div class="checkmark"></div>
+                <div className="checkmark"></div>
               </label>
               <label htmlFor={`check-${index}`} id={`taskName-${index}`}>
                 <h4>{task}</h4>
